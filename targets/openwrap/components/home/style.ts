@@ -42,4 +42,9 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'orange',
   },
+  bottomAd: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'cyan',
+  },
 });
