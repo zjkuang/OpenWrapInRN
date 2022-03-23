@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.openwrapinrn">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.openwrapinrn">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -10,20 +11,34 @@
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
       android:theme="@style/AppTheme">
-      <meta-data
-        android:name="com.google.android.gms.ads.APPLICATION_ID"
-        android:value="~~~com.google.android.gms.ads.APPLICATION_ID~~~"/>
-      <activity
-        android:name=".MainActivity"
-        android:exported="true"
-        android:label="@string/app_name"
-        android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
-        android:launchMode="singleTask"
-        android:windowSoftInputMode="adjustResize">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-      </activity>
+        <meta-data
+          android:name="com.google.android.gms.ads.APPLICATION_ID"
+          android:value="~~~com.google.android.gms.ads.APPLICATION_ID~~~"/>
+        <activity
+          android:name=".MainActivity"
+          android:exported="true"
+          android:label="@string/app_name"
+          android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+          android:launchMode="singleTask"
+          android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- PubMatic OpenWrap -->
+        <activity
+          android:name="com.pubmatic.sdk.webrendering.mraid.POBVideoPlayerActivity"
+          android:exported="false"
+          tools:node="merge" />
+        <activity
+          android:name="com.pubmatic.sdk.webrendering.ui.POBFullScreenActivity"
+          android:exported="false"
+          tools:node="merge" />
+        <activity
+          android:name="com.pubmatic.sdk.common.browser.POBInternalBrowserActivity"
+          android:exported="false"
+          tools:node="merge" />
     </application>
 </manifest>
