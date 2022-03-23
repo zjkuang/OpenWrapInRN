@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
+    "android": "cd utils && ./apply-secrets.bash && cd .. && react-native run-android && cd utils && ./hide-secrets.bash && cd ..",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
