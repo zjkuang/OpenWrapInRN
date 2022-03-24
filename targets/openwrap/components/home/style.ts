@@ -43,8 +43,6 @@ export const styles = StyleSheet.create({
     backgroundColor: 'orange',
   },
   bottomAd: {
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: 'cyan',
   },
 });

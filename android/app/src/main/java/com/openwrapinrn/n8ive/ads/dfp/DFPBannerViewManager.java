@@ -11,7 +11,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import java.util.Map;
 
 public class DFPBannerViewManager extends SimpleViewManager<DFPBannerViewGroup> {
-    private static final String REACT_CLASS = "DFPBanner";
+    private static final String REACT_CLASS = "DFPBannerNative";
     private ThemedReactContext mThemedReactContext;
 
     private static final String PROP_PUBLISHER_ID = "publisherID";

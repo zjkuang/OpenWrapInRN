@@ -8,6 +8,7 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
+import com.openwrapinrn.n8ive.ads.dfp.DFPPackage;
 import com.openwrapinrn.n8ive.ads.openwrap.OpenWrapPackage;
 
 import java.lang.reflect.InvocationTargetException;
@@ -29,6 +30,7 @@ public class MainApplication extends Application implements ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           packages.add(new OpenWrapPackage());
+          packages.add(new DFPPackage());
           return packages;
         }
 
