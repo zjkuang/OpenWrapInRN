@@ -15,7 +15,7 @@ cd OpenWrapInRN
 (3) Create `android/local.properties` file  
 Create `android/local.properties` and follow [this](https://stackoverflow.com/a/54234228/7455975) to indicate the location of the Android Studio SDK installation (which may be different on different machines).
 
-(4) Create .secret file  
+(4) Create secrets.json file in OpenWrapInRN's root directory  
 ```
 {
   "com.google.android.gms.ads.APPLICATION_ID": "<your-google-gms-app-id>",
