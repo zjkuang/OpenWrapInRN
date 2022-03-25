@@ -231,11 +231,17 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
                 adView.measure(width, height);
                 adView.layout(left, top, left + width, top + height);
 
-                WritableMap event = Arguments.createMap();
-                event.putDouble("width", width);
-                event.putDouble("height", height);
-                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_SIZE_CHANGE.toString(), event);
-                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_DID_RECEIVE_AD.toString(), null);
+                WritableMap size = Arguments.createMap();
+                size.putDouble("width", width);
+                size.putDouble("height", height);
+                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_SIZE_CHANGE.toString(), size);
+
+                WritableMap frame = Arguments.createMap();
+                frame.putDouble("x", left);
+                frame.putDouble("y", top);
+                frame.putDouble("width", width);
+                frame.putDouble("height", height);
+                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_DID_RECEIVE_AD.toString(), frame);
 
                 mPubMaticBidding = true; // OpenWrap will refresh its bidding automatically every 30 sec
             }

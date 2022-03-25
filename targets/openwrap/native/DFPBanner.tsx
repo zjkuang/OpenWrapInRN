@@ -22,7 +22,9 @@ export interface DFPBannerProps extends ViewProps {
   slotUUID?: string;
   adSizeTag: AdSizeTag;
   onSizeChange?: (dims: Record<'width' | 'height', number>) => void;
-  onBannerViewDidReceiveAd?: () => void;
+  onBannerViewDidReceiveAd?: (
+    frame: Record<'x' | 'y' | 'width' | 'height', number>,
+  ) => void;
   onDidFailToReceiveAdWithError?: (error: string) => void;
 }
 
