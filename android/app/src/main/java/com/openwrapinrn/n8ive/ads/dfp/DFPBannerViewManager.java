@@ -55,10 +55,10 @@ public class DFPBannerViewManager extends SimpleViewManager<DFPBannerViewGroup> 
 
     @Override
     @Nullable
-    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
+    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
         MapBuilder.Builder<String, Object> builder = MapBuilder.builder();
-        for (Events event : Events.values()) {
-            builder.put(event.toString(), MapBuilder.of("registrationName", event.toString()));
+        for (Events event: Events.values()) {
+            builder.put(event.toString(), MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", event.toString())));
         }
         return builder.build();
     }

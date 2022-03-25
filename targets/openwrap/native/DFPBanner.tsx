@@ -29,16 +29,5 @@ export interface DFPBannerProps extends ViewProps {
 }
 
 export const DFPBanner = (props: DFPBannerProps) => {
-  const [events, setEvents] = React.useState<Partial<DFPBannerProps>>({});
-  React.useEffect(() => {
-    const newEvents: Partial<DFPBannerProps> = {};
-    if (props.onSizeChange) {
-      const nativeOnSizeChange: (e: any) => void = e => {
-        props.onSizeChange?.(e.nativeEvent);
-      };
-      newEvents.onSizeChange = nativeOnSizeChange;
-    }
-    setEvents(newEvents);
-  }, [props, props.onSizeChange]);
-  return <DFPBannerNative {...props} {...events} />;
+  return <DFPBannerNative {...props} />;
 };

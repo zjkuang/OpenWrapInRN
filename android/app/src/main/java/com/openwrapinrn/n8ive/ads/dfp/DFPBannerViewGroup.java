@@ -40,8 +40,6 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
     private String mAdSizeTag = "";
     private AdSize[] mAdSizes;
     private Boolean mPropChanged = false;
-    private int mLastWidth = -1;
-    private int mLastHeight = -1;
     private Map<String, List<String>> mDTBCustomTargeting;
     private Boolean mPubMaticBidding = false;
 
@@ -188,23 +186,6 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
             @Override
             public void configure(@NonNull AdManagerAdView adView, @NonNull AdManagerAdRequest.Builder adRequestBuilder, @Nullable POBBid pobBid) {
                 adView.setAdSizes(AdSize.FLUID, AdSize.BANNER, AdSize.MEDIUM_RECTANGLE);
-
-                int width, height;
-                if (adView.getAdSize().equals(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(mThemedReactContext, adView.getAdSize().getWidthInPixels(mThemedReactContext)))) {
-                    width = adView.getAdSize().getWidthInPixels(mThemedReactContext);
-                    height = adView.getAdSize().getHeightInPixels(mThemedReactContext);
-                } else {
-                    width = adView.getWidth();
-                    height = adView.getHeight();
-                }
-                if (width != mLastWidth || height != mLastHeight) {
-                    mLastHeight = height;
-                    mLastWidth = width;
-                    WritableMap event = Arguments.createMap();
-                    event.putDouble("width", width);
-                    event.putDouble("height", height);
-                    mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_SIZE_CHANGE.toString(), event);
-                }
 
                 adRequestBuilder.setContentUrl("http://www.gasbuddy.com");
 
