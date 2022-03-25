@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
   },
   bottomAd: {
     backgroundColor: 'cyan',
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
 });
