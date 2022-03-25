@@ -52,8 +52,15 @@ And then edit secrets.json to fill in all the IDs and KEYs needed.
 yarn install
 ```
 
-(6) Run the app  
+(6) Run the app
+(6.1) Start Metro  
 (in OpenWrapInRN root directory)
+```
+yarn start
+```
+
+(6.2) Run Android app  
+(Start a new Terminal and cd to OpenWrapInRN root directory)
 ```
 yarn android
 ```
@@ -63,4 +70,4 @@ android:value="~~~com.google.android.gms.ads.APPLICATION_ID~~~"/>
 ```
 and replace the placeholder value to your real `com.google.android.gms.ads.APPLICATION_ID`. (I haven't figured out how to configure pre- and post- build scripts for Android Studio yet so you will have to do it manually.) But DO NOT SUBMIT YOUR CHANGE WITH YOUR APP ID SINCE THIS IS A PUBLIC REPOSITORY.
 
-(7) (iOS part is not done yet.)
+(6.3) (iOS part is not done yet.)
