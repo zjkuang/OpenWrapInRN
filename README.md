@@ -2,20 +2,20 @@
 
 ## Setup
 
-(1) Clone the repository to your local machine
+### (1) Clone the repository to your local machine
 ```
 git clone https://github.com/zjkuang/OpenWrapInRN.git
 ```
 
-(2) Change your working directory to the cloned repository
+### (2) Change your working directory to the cloned repository
 ```
 cd OpenWrapInRN
 ```
 
-(3) Create `android/local.properties` file  
+### (3) Create `android/local.properties` file
 Create `android/local.properties` and follow [this](https://stackoverflow.com/a/54234228/7455975) to indicate the location of the Android Studio SDK installation (which may be different on different machines).
 
-(4) Create secrets.json file in OpenWrapInRN's root directory
+### (4) Create secrets.json file in OpenWrapInRN's root directory
 ```
 cp secrets.json.template secrets.json
 ```
@@ -46,20 +46,20 @@ And then edit secrets.json to fill in all the IDs and KEYs needed.
 }
 ```
 
-(5) Install the packages  
+### (5) Install the packages
 (in OpenWrapInRN root directory)
 ```
 yarn install
 ```
 
-(6) Run the app
-(6.1) Start Metro  
+### (6) Run the app
+#### (6.1) Start Metro
 (in OpenWrapInRN root directory)
 ```
 yarn start
 ```
 
-(6.2) Run Android app  
+#### (6.2) Run Android app
 (Start a new Terminal and cd to OpenWrapInRN root directory)
 ```
 yarn android
@@ -70,4 +70,4 @@ android:value="~~~com.google.android.gms.ads.APPLICATION_ID~~~"/>
 ```
 and replace the placeholder value to your real `com.google.android.gms.ads.APPLICATION_ID`. (I haven't figured out how to configure pre- and post- build scripts for Android Studio yet so you will have to do it manually.) But DO NOT SUBMIT YOUR CHANGE WITH YOUR APP ID SINCE THIS IS A PUBLIC REPOSITORY.
 
-(6.3) (iOS part is not done yet.)
+#### (6.3) (iOS part is not done yet.)
