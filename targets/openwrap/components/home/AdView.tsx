@@ -4,6 +4,10 @@ import {AdSizeTag, DFPBanner} from '../../native';
 import {AdPlacement, useAdSize, useAdSecrets} from './helper';
 import {styles} from './style';
 
+type BannerViewSize = {
+  width: number;
+  height: number;
+};
 export type BannerViewFrame = {
   x: number;
   y: number;
@@ -15,22 +19,27 @@ export type AdViewProps = {
 };
 export const AdView = (props: AdViewProps) => {
   const adSecrets = useAdSecrets(props.placement);
-  const adSize = useAdSize(props.placement);
+  const [viewSize, setViewSize] = React.useState<BannerViewSize>(
+    useAdSize(props.placement),
+  );
   const onSizeChange = React.useCallback(e => {
-    console.log('onSizeChange:', JSON.stringify(e.nativeEvent));
-    const {width, height} = e.nativeEvent;
-    console.log(`size: ${width} x ${height}`);
+    const size: BannerViewSize = e.nativeEvent;
+    console.log(`onSizeChange :: size: ${size.width} x ${size.height}`);
+    setViewSize(size);
   }, []);
   const onBannerViewDidReceiveAd = React.useCallback(e => {
-    console.log('onBannerViewDidReceiveAd:', JSON.stringify(e.nativeEvent));
     const frame: BannerViewFrame = e.nativeEvent;
     console.log(
-      `frame: (${frame.x}, ${frame.y}), ${frame.width} x ${frame.height}`,
+      `onBannerViewDidReceiveAd :: frame: (${frame.x}, ${frame.y}), ${frame.width} x ${frame.height}`,
     );
   }, []);
+
   return (
     <View
-      style={[styles.bottomAd, {width: adSize.width, height: adSize.height}]}>
+      style={[
+        styles.bottomAd,
+        {width: viewSize.width, height: viewSize.height},
+      ]}>
       <DFPBanner
         adSizeTag={AdSizeTag.Banner}
         {...adSecrets}
