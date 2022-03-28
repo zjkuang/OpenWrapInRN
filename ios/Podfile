@@ -23,6 +23,11 @@ target 'OpenWrapInRN' do
   # you should disable the next line.
   use_flipper!()
 
+  pod 'AmazonPublisherServicesSDK', "4.4.1"
+  pod 'Google-Mobile-Ads-SDK'
+  pod 'OpenWrapSDK', '2.4.0'
+  pod 'OpenWrapHandlerDFP', '2.4.0'
+
   post_install do |installer|
     react_native_post_install(installer)
     __apply_Xcode_12_5_M1_post_install_workaround(installer)

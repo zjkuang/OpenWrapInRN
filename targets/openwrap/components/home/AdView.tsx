@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import {AdSizeTag, DFPBanner} from '../../native';
 import {AdPlacement, useAdSize, useAdSecrets} from './helper';
 import {styles} from './style';
@@ -34,19 +34,33 @@ export const AdView = (props: AdViewProps) => {
     );
   }, []);
 
+  const styleAdjustment = React.useMemo(() => {
+    if (Platform.OS === 'android') {
+      return {width: viewSize.width, height: viewSize.height};
+    } else if (Platform.OS === 'ios') {
+      if (props.placement === 'Home-Anchor') {
+        return {width: 320, height: 50};
+      } else if (props.placement === 'List-Inside') {
+        return {width: 300, height: 250};
+      } else if (props.placement === 'List-Bottom') {
+        return {width: 300, height: 100};
+      } else {
+        return {};
+      }
+    }
+  }, [props.placement, viewSize.height, viewSize.width]);
+
   return (
-    <View
-      style={[
-        styles.bottomAd,
-        {width: viewSize.width, height: viewSize.height},
-      ]}>
-      <DFPBanner
-        adSizeTag={AdSizeTag.Banner}
-        {...adSecrets}
-        isOnScreen
-        onSizeChange={onSizeChange}
-        onBannerViewDidReceiveAd={onBannerViewDidReceiveAd}
-      />
+    <View style={[styles.bottomAd, styleAdjustment]}>
+      {Platform.OS === 'android' ? (
+        <DFPBanner
+          adSizeTag={AdSizeTag.Banner}
+          {...adSecrets}
+          isOnScreen
+          onSizeChange={onSizeChange}
+          onBannerViewDidReceiveAd={onBannerViewDidReceiveAd}
+        />
+      ) : null}
     </View>
   );
 };

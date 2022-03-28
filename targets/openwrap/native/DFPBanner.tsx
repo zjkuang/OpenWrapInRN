@@ -1,5 +1,5 @@
 import React from 'react';
-import {ViewProps, requireNativeComponent} from 'react-native';
+import {requireNativeComponent, ViewProps} from 'react-native';
 
 export enum AdSizeTag {
   Invalid = 'Invalid',
