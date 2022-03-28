@@ -2,6 +2,8 @@ package com.openwrapinrn.n8ive.ads.dfp;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -164,7 +166,9 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
         String shortAdUnitID = mAdUnitID.substring(mAdUnitID.lastIndexOf('/') + 1).trim();
         POBBannerView bannerView = new POBBannerView(mThemedReactContext, mPublisherID, mProfileID, shortAdUnitID, eventHandler);
         removeBanner();
-        addView(bannerView);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        addView(bannerView, layoutParams);
         mBannerView = bannerView;
         attachEvents();
 
