@@ -3,6 +3,7 @@ package com.openwrapinrn.n8ive.ads.dfp;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -10,7 +11,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.Map;
 
-public class DFPBannerViewManager extends SimpleViewManager<DFPBannerViewGroup> {
+public class DFPBannerViewManager extends SimpleViewManager<DFPBannerViewGroup> implements LifecycleEventListener {
     private static final String REACT_CLASS = "DFPBannerNative";
     private ThemedReactContext mThemedReactContext;
 
@@ -20,6 +21,7 @@ public class DFPBannerViewManager extends SimpleViewManager<DFPBannerViewGroup> 
     private static final String PROP_AD_UNIT_ID = "adUnitID";
     private static final String PROP_SLOT_UUID = "slotUUID";
     private static final String PROP_AD_SIZE_TAG = "adSizeTag";
+    private DFPBannerViewGroup bannerView = null;
 
     @NonNull
     @Override
@@ -97,5 +99,22 @@ public class DFPBannerViewManager extends SimpleViewManager<DFPBannerViewGroup> 
     protected void onAfterUpdateTransaction(@NonNull DFPBannerViewGroup view) { // = <iOS>didSetProps
         super.onAfterUpdateTransaction(view);
         view.onAfterUpdateTransaction();
+    }
+
+    @Override
+    public void onHostResume() {
+        // No action required.
+    }
+
+    @Override
+    public void onHostPause() {
+        // No action required.
+    }
+
+    @Override
+    public void onHostDestroy() {
+        if (null != bannerView) {
+            bannerView.destroyBanner();
+        }
     }
 }

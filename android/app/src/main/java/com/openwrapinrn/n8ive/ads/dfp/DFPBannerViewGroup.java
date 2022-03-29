@@ -179,6 +179,12 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
     private void removeBanner() {
         if (mBannerView != null) {
             removeView(mBannerView);
+            destroyBanner();
+        }
+    }
+
+    public void destroyBanner() {
+        if (mBannerView != null) {
             mBannerView.destroy();
             mBannerView = null;
         }
