@@ -2,7 +2,10 @@ package com.openwrapinrn.n8ive.ads.dfp;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
@@ -221,6 +224,15 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
                 int top = adView.getTop();
                 adView.measure(width, height);
                 adView.layout(left, top, left + width, top + height);
+
+                int childCount = adView.getChildCount();
+                for (int position = 0; position < childCount; position++){
+                    View childView = adView.getChildAt(position);
+                    if(childView.getLayoutParams() instanceof FrameLayout.LayoutParams){
+                        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)childView.getLayoutParams();
+                        layoutParams.gravity = Gravity.NO_GRAVITY;
+                    }
+                }
 
                 WritableMap size = Arguments.createMap();
                 size.putDouble("width", width);
