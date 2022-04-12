@@ -21,6 +21,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.admanager.AdManagerAdRequest;
 import com.google.android.gms.ads.admanager.AdManagerAdView;
 import com.google.android.gms.ads.admanager.AppEventListener;
+import com.openwrapinrn.R;
 import com.pubmatic.sdk.common.POBError;
 import com.pubmatic.sdk.openwrap.banner.POBBannerView;
 import com.pubmatic.sdk.openwrap.core.POBBid;
@@ -218,13 +219,8 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
         mBannerView.setListener(new POBBannerView.POBBannerViewListener() {
             @Override
             public void onAdReceived(POBBannerView adView) {
-                int width = adView.getCreativeSize().getAdWidth();
-                int height = adView.getCreativeSize().getAdHeight();
-                int left = adView.getLeft();
-                int top = adView.getTop();
-                adView.measure(width, height);
-                adView.layout(left, top, left + width, top + height);
-
+                // Setting the gravity to center was causing an layout issue when OpenWrap Banner is integrated with React Native application,
+                // To resolve this issue, one must overwrite the child views of POBBannerView's property to NO_GRAVITY
                 int childCount = adView.getChildCount();
                 for (int position = 0; position < childCount; position++){
                     View childView = adView.getChildAt(position);
@@ -234,14 +230,22 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
                     }
                 }
 
+                int width = adView.getCreativeSize().getAdWidth();
+                int height = adView.getCreativeSize().getAdHeight();
+                int left = adView.getLeft();
+                int top = adView.getTop();
+                adView.measure(width, height);
+                adView.layout(left, top, left + width, top + height);
+
+                // adView.setBackgroundColor(getResources().getColor(R.color.catalyst_redbox_background));
                 WritableMap size = Arguments.createMap();
                 size.putDouble("width", width);
                 size.putDouble("height", height);
                 mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_SIZE_CHANGE.toString(), size);
 
                 WritableMap frame = Arguments.createMap();
-                frame.putDouble("x", left);
-                frame.putDouble("y", top);
+                //frame.putDouble("x", left);
+                //frame.putDouble("y", top);
                 frame.putDouble("width", width);
                 frame.putDouble("height", height);
                 mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_DID_RECEIVE_AD.toString(), frame);
