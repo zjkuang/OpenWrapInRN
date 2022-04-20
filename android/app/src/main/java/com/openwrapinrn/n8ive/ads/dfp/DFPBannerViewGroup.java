@@ -227,6 +227,15 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
                     if(childView.getLayoutParams() instanceof FrameLayout.LayoutParams){
                         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)childView.getLayoutParams();
                         layoutParams.gravity = Gravity.NO_GRAVITY;
+                        // This doesn't work for fluid ads
+                        // if (fluid) {
+                        //     // https://developers.google.com/ad-manager/mobile-ads-sdk/android/native/styles#fluid_size
+                        //     layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+                        //     layoutParams.width = LayoutParams.MATCH_PARENT;
+                        //     layoutParams.height = LayoutParams.WRAP_CONTENT;
+                        // }
+                        // Fluid ads seems to have been broken by GAM Android SDK:
+                        //   https://groups.google.com/g/google-admob-ads-sdk/c/PLc6xW1_ETA/m/xMO8JRuzAQAJ
                     }
                 }
 
