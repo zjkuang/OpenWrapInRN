@@ -195,7 +195,8 @@ dependencies {
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
-    implementation 'com.google.android.gms:play-services-ads:20.6.0'
+    // implementation 'com.google.android.gms:play-services-ads:20.6.0'
+    implementation 'com.google.firebase:firebase-ads:20.6.0'
     implementation 'com.pubmatic.sdk:openwrap:2.4.0'
     implementation 'com.pubmatic.sdk:openwrap-eventhandler-dfp:2.6.0'
 
