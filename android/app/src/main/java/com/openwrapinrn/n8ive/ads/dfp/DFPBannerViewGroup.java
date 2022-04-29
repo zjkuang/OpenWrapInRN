@@ -168,7 +168,18 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
 
         DFPBannerEventHandler eventHandler = makeBannerEventHandler();
         String shortAdUnitID = mAdUnitID.substring(mAdUnitID.lastIndexOf('/') + 1).trim();
-        POBBannerView bannerView = new POBBannerView(mThemedReactContext, mPublisherID, mProfileID, shortAdUnitID, eventHandler);
+        // POBBannerView bannerView = new POBBannerView(mThemedReactContext, mPublisherID, mProfileID, shortAdUnitID, eventHandler);
+        POBBannerView bannerView;
+        if (mAdSizeTag == "mediumrectangle") {
+            bannerView = findViewById(R.id.pob_banner_view_medium_rectangle);
+        } else {
+            bannerView = findViewById(R.id.pob_banner_view_banner);
+        }
+        if (bannerView == null) {
+            Log.e(LOG_TAG, "bannerView = findViewById(R.id...) failed.");
+            return;
+        }
+        bannerView.init(mPublisherID, mProfileID, shortAdUnitID, eventHandler);
         removeBanner();
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
