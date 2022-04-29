@@ -156,15 +156,16 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
         }
 
         AdManagerAdView adView = new AdManagerAdView(this.mThemedReactContext);
-        // adView.setAdSizes(AdSize.BANNER, AdSize.MEDIUM_RECTANGLE, AdSize.FLUID);
-        adView.setAdSizes(AdSize.BANNER);
+        adView.setAdSizes(AdSize.BANNER, AdSize.MEDIUM_RECTANGLE, AdSize.FLUID);
+        //adView.setAdSizes(AdSize.BANNER);
         // adView.setAdSizes(mAdSizes);
-        adView.setAdUnitId("/6499/example/banner"); // test ID: "/6499/example/banner"
+        adView.setAdUnitId(mAdUnitID); // test ID: "/6499/example/banner"
         removeBanner();
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         addView(adView, layoutParams);
         mAdView = adView;
+        adView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
         mAdView.setAdListener(new AdListener() {
             @Override
             public void onAdClicked() {
@@ -189,6 +190,52 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();
+                // Setting the gravity to center was causing an layout issue when OpenWrap Banner is integrated with React Native application,
+                // To resolve this issue, one must overwrite the child views of POBBannerView's property to NO_GRAVITY
+                int childCount = adView.getChildCount();
+                for (int position = 0; position < childCount; position++){
+                    View childView = adView.getChildAt(position);
+                    if(childView.getLayoutParams() instanceof FrameLayout.LayoutParams){
+                        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)childView.getLayoutParams();
+                        layoutParams.gravity = Gravity.END;
+                        // This doesn't work for fluid ads
+                        // if (fluid) {
+                        //     // https://developers.google.com/ad-manager/mobile-ads-sdk/android/native/styles#fluid_size
+                        //     layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+                        //     layoutParams.width = LayoutParams.MATCH_PARENT;
+                        //     layoutParams.height = LayoutParams.WRAP_CONTENT;
+                        // }
+                        // Fluid ads seems to have been broken by GAM Android SDK:
+                        //   https://groups.google.com/g/google-admob-ads-sdk/c/PLc6xW1_ETA/m/xMO8JRuzAQAJ
+                    }
+                }
+
+                AdSize adSize = adView.getAdSize();
+                int width = adSize.getWidthInPixels(mThemedReactContext);
+                int height = adSize.getHeightInPixels(mThemedReactContext) + 200;
+                int left = adView.getLeft() + 500;
+                int top = adView.getTop();
+                adView.measure(width, height);
+                adView.layout(left, top, left + width, top + height);
+
+                if (adView.getAdSize().isFluid()) {
+                    // Seems we still cannot recognize the fluid ad.
+                }
+
+                adView.setBackgroundColor(getResources().getColor(R.color.catalyst_redbox_background));
+                WritableMap size = Arguments.createMap();
+                size.putDouble("width", width);
+                size.putDouble("height", height);
+                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_SIZE_CHANGE.toString(), size);
+
+                WritableMap frame = Arguments.createMap();
+                //frame.putDouble("x", left);
+                //frame.putDouble("y", top);
+                frame.putDouble("width", width);
+                frame.putDouble("height", height);
+                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_DID_RECEIVE_AD.toString(), frame);
+
+                //mPubMaticBidding = true; // OpenWrap will refresh its bidding automatically every 30 sec
             }
 
             @Override
