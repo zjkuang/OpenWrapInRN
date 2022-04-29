@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">OpenWrapInRN</string>
+    <string name="ad_unit_id_banner">/1025479/Mobile_iPhone_Home_Screen_Anchor_P</string>
+    <string name="ad_unit_id_medium_rectangle">/1025479/ca-pub-9634286501775085/Mobile_iPhone_List_Screen_Inside2</string>
+    <string name="ad_unit_id_fluid">/1025479/ca-pub-9634286501775085/Mobile_iPhone_List_Screen_Bottom</string>
 </resources>
