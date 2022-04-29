@@ -3,6 +3,7 @@ package com.openwrapinrn.n8ive.ads.dfp;
 import android.content.Context;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -171,9 +172,9 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
         // POBBannerView bannerView = new POBBannerView(mThemedReactContext, mPublisherID, mProfileID, shortAdUnitID, eventHandler);
         POBBannerView bannerView;
         if (mAdSizeTag == "mediumrectangle") {
-            bannerView = findViewById(R.id.pob_banner_view_medium_rectangle);
+            bannerView = (POBBannerView) LayoutInflater.from(mThemedReactContext).inflate(R.layout.pob_banner_view_medium_rectangle, null);
         } else {
-            bannerView = findViewById(R.id.pob_banner_view_banner);
+            bannerView = (POBBannerView) LayoutInflater.from(mThemedReactContext).inflate(R.layout.pob_banner_view_banner, null);
         }
         if (bannerView == null) {
             Log.e(LOG_TAG, "bannerView = findViewById(R.id...) failed.");
