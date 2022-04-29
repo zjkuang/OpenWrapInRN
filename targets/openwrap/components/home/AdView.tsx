@@ -41,7 +41,12 @@ export const AdView = (props: AdViewProps) => {
         {width: viewSize.width, height: viewSize.height},
       ]}>
       <DFPBanner
-        adSizeTag={AdSizeTag.Banner}
+        placement={props.placement}
+        adSizeTag={
+          props.placement === 'List-Inside'
+            ? AdSizeTag.MediumRectangle
+            : AdSizeTag.Banner
+        }
         {...adSecrets}
         isOnScreen
         onSizeChange={onSizeChange}

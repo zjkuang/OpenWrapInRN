@@ -45,6 +45,7 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
     private String mAdUnitID = "";
     private String mSlotUUID = "";
     private String mAdSizeTag = "";
+    private String mPlacement = "";
     private AdSize[] mAdSizes;
     private Boolean mPropChanged = false;
     private Map<String, List<String>> mDTBCustomTargeting;
@@ -125,6 +126,14 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
         }
     }
 
+    public void setPropPlacement(final String placement) {
+        Log.d(LOG_TAG, String.format("setPropPlacement: %s", placement));
+        if (placement != null && !placement.equals(mPlacement)) {
+            mPlacement = placement;
+            mPropChanged = true;
+        }
+    }
+
     public void onAfterUpdateTransaction() { // = <iOS>didSetProps
         if (mPropChanged) {
             loadBanner();
@@ -171,15 +180,18 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
         String shortAdUnitID = mAdUnitID.substring(mAdUnitID.lastIndexOf('/') + 1).trim();
         // POBBannerView bannerView = new POBBannerView(mThemedReactContext, mPublisherID, mProfileID, shortAdUnitID, eventHandler);
         POBBannerView bannerView;
-        if (mAdSizeTag == "mediumrectangle") {
+        if (mPlacement == "List-Inside") {
             bannerView = (POBBannerView) LayoutInflater.from(mThemedReactContext).inflate(R.layout.pob_banner_view_medium_rectangle, null);
+        } else if (mPlacement == "List-Bottom") {
+            bannerView = (POBBannerView) LayoutInflater.from(mThemedReactContext).inflate(R.layout.pob_banner_view_fluid, null);
         } else {
             bannerView = (POBBannerView) LayoutInflater.from(mThemedReactContext).inflate(R.layout.pob_banner_view_banner, null);
         }
         if (bannerView == null) {
-            Log.e(LOG_TAG, "bannerView = findViewById(R.id...) failed.");
+            Log.e(LOG_TAG, String.format("XML layout for placement %s is not found.", mPlacement));
             return;
         }
+        Log.d(LOG_TAG, String.format("XML layout for placement %s is loaded.", mPlacement));
         bannerView.init(mPublisherID, mProfileID, shortAdUnitID, eventHandler);
         removeBanner();
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);

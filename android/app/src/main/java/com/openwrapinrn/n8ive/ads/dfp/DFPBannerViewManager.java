@@ -21,6 +21,7 @@ public class DFPBannerViewManager extends SimpleViewManager<DFPBannerViewGroup> 
     private static final String PROP_AD_UNIT_ID = "adUnitID";
     private static final String PROP_SLOT_UUID = "slotUUID";
     private static final String PROP_AD_SIZE_TAG = "adSizeTag";
+    private static final String PROP_PLACEMENT = "placement";
     private DFPBannerViewGroup bannerView = null;
 
     @NonNull
@@ -93,6 +94,11 @@ public class DFPBannerViewManager extends SimpleViewManager<DFPBannerViewGroup> 
     @ReactProp(name = PROP_AD_SIZE_TAG)
     public void setPropAdSizeTag(final DFPBannerViewGroup view, final String adSizeTag) {
         view.setPropAdSizeTag(adSizeTag);
+    }
+
+    @ReactProp(name = PROP_PLACEMENT)
+    public void setPropPlacement(final DFPBannerViewGroup view, final String placement) {
+        view.setPropPlacement(placement);
     }
 
     @Override
