@@ -34,7 +34,7 @@ import com.pubmatic.sdk.openwrap.eventhandler.dfp.DFPBannerEventHandler;
 import java.util.List;
 import java.util.Map;
 
-public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListener, POBBidEventListener {
+public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListener {
     private ThemedReactContext mThemedReactContext;
     private RCTEventEmitter mEmitter;
     private String LOG_TAG = "DFPBannerViewGroup";
@@ -48,10 +48,7 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
     private String mAdSizeTag = "";
     private AdSize[] mAdSizes;
     private Boolean mPropChanged = false;
-    private Map<String, List<String>> mDTBCustomTargeting;
-    private Boolean mPubMaticBidding = false;
 
-    // private POBBannerView mBannerView = null;
     AdManagerAdView mAdView = null;
 
     public DFPBannerViewGroup(ThemedReactContext context) {
@@ -63,22 +60,10 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
     // AppEventListener
     @Override
     public void onAppEvent(@NonNull String name, @NonNull String info) {
-        Log.d("onAppEvent", String.format("onAppEvent: %s", name));
+        Log.d(LOG_TAG, String.format("onAppEvent: %s", name));
         WritableMap event = Arguments.createMap();
         event.putString(name, info);
         mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_ADMOB_EVENT_RECEIVED.toString(), event);
-    }
-
-    // POBBidEventListener
-    @Override
-    public void onBidReceived(@NonNull POBBidEvent pobBidEvent, @NonNull POBBid pobBid) {
-        didFinishPubMaticBidding();
-    }
-
-    // POBBidEventListener
-    @Override
-    public void onBidFailed(@NonNull POBBidEvent pobBidEvent, @NonNull POBError pobError) {
-        didFinishPubMaticBidding();
     }
 
     public void setPropPublisherID(final String publisherID) {
@@ -170,21 +155,16 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
             return;
         }
 
-        DFPBannerEventHandler eventHandler = makeBannerEventHandler();
-        String shortAdUnitID = mAdUnitID.substring(mAdUnitID.lastIndexOf('/') + 1).trim();
-        // POBBannerView bannerView = new POBBannerView(mThemedReactContext, mPublisherID, mProfileID, shortAdUnitID, eventHandler);
         AdManagerAdView adView = new AdManagerAdView(this.mThemedReactContext);
         // adView.setAdSizes(AdSize.BANNER, AdSize.MEDIUM_RECTANGLE, AdSize.FLUID);
-        adView.setAdSizes(mAdSizes);
+        adView.setAdSizes(AdSize.BANNER);
+        // adView.setAdSizes(mAdSizes);
         adView.setAdUnitId("/6499/example/banner"); // test ID: "/6499/example/banner"
         removeBanner();
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        // addView(bannerView, layoutParams);
         addView(adView, layoutParams);
-        // mBannerView = bannerView;
         mAdView = adView;
-        // attachEvents();
         mAdView.setAdListener(new AdListener() {
             @Override
             public void onAdClicked() {
@@ -217,17 +197,11 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
             }
         });
 
-        // mPubMaticBidding = true;
-        // mBannerView.loadAd(); // -> POBBidEventListener :: onBidReceived()/onBidFailed(); POBBannerViewListener :: onAdReceived()/onAdFailed()
         AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
         mAdView.loadAd(adRequest);
     }
 
     private void removeBanner() {
-//        if (mBannerView != null) {
-//            removeView(mBannerView);
-//            destroyBanner();
-//        }
         if (mAdView != null) {
             removeView(mAdView);
             destroyBanner();
@@ -235,125 +209,9 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
     }
 
     public void destroyBanner() {
-//        if (mBannerView != null) {
-//            mBannerView.destroy();
-//            mBannerView = null;
-//        }
         if (mAdView != null) {
             mAdView.destroy();
             mAdView = null;
         }
-    }
-
-    private DFPBannerEventHandler makeBannerEventHandler() {
-        DFPBannerEventHandler eventHandler = new DFPBannerEventHandler(mThemedReactContext, mAdUnitID, mAdSizes);
-        eventHandler.setConfigListener(new DFPBannerEventHandler.DFPConfigListener() {
-            @Override
-            public void configure(@NonNull AdManagerAdView adView, @NonNull AdManagerAdRequest.Builder adRequestBuilder, @Nullable POBBid pobBid) {
-                adView.setAdSizes(AdSize.FLUID, AdSize.BANNER, AdSize.MEDIUM_RECTANGLE);
-
-                adRequestBuilder.setContentUrl("http://www.gasbuddy.com");
-
-                if (mDTBCustomTargeting != null) {
-                    for (String key: mDTBCustomTargeting.keySet()) {
-                        adRequestBuilder.addCustomTargeting(key, mDTBCustomTargeting.get(key));
-                    }
-                }
-            }
-        });
-        return eventHandler;
-    }
-
-    protected void attachEvents() {
-//        if (mBannerView == null) { return; }
-//        final String TAG = "BannerViewListener";
-//        mBannerView.setListener(new POBBannerView.POBBannerViewListener() {
-//            @Override
-//            public void onAdReceived(POBBannerView adView) {
-//                // Setting the gravity to center was causing an layout issue when OpenWrap Banner is integrated with React Native application,
-//                // To resolve this issue, one must overwrite the child views of POBBannerView's property to NO_GRAVITY
-//                int childCount = adView.getChildCount();
-//                for (int position = 0; position < childCount; position++){
-//                    View childView = adView.getChildAt(position);
-//                    if(childView.getLayoutParams() instanceof FrameLayout.LayoutParams){
-//                        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)childView.getLayoutParams();
-//                        layoutParams.gravity = Gravity.NO_GRAVITY;
-//                        // This doesn't work for fluid ads
-//                        // if (fluid) {
-//                        //     // https://developers.google.com/ad-manager/mobile-ads-sdk/android/native/styles#fluid_size
-//                        //     layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
-//                        //     layoutParams.width = LayoutParams.MATCH_PARENT;
-//                        //     layoutParams.height = LayoutParams.WRAP_CONTENT;
-//                        // }
-//                        // Fluid ads seems to have been broken by GAM Android SDK:
-//                        //   https://groups.google.com/g/google-admob-ads-sdk/c/PLc6xW1_ETA/m/xMO8JRuzAQAJ
-//                    }
-//                }
-//
-//                int width = adView.getCreativeSize().getAdWidth();
-//                int height = adView.getCreativeSize().getAdHeight();
-//                int left = adView.getLeft();
-//                int top = adView.getTop();
-//                adView.measure(width, height);
-//                adView.layout(left, top, left + width, top + height);
-//
-//                // adView.setBackgroundColor(getResources().getColor(R.color.catalyst_redbox_background));
-//                WritableMap size = Arguments.createMap();
-//                size.putDouble("width", width);
-//                size.putDouble("height", height);
-//                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_SIZE_CHANGE.toString(), size);
-//
-//                WritableMap frame = Arguments.createMap();
-//                //frame.putDouble("x", left);
-//                //frame.putDouble("y", top);
-//                frame.putDouble("width", width);
-//                frame.putDouble("height", height);
-//                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_DID_RECEIVE_AD.toString(), frame);
-//
-//                mPubMaticBidding = true; // OpenWrap will refresh its bidding automatically every 30 sec
-//            }
-//
-//            @Override
-//            public void onAdFailed(POBBannerView adView, POBError error) {
-//                WritableMap event = Arguments.createMap();
-//                switch (error.getErrorCode()) {
-//                    case AdManagerAdRequest.ERROR_CODE_INTERNAL_ERROR:
-//                        event.putString("error", "ERROR_CODE_INTERNAL_ERROR");
-//                        break;
-//                    case AdManagerAdRequest.ERROR_CODE_INVALID_REQUEST:
-//                        event.putString("error", "ERROR_CODE_INVALID_REQUEST");
-//                        break;
-//                    case AdManagerAdRequest.ERROR_CODE_NETWORK_ERROR:
-//                        event.putString("error", "ERROR_CODE_NETWORK_ERROR");
-//                        break;
-//                    case AdManagerAdRequest.ERROR_CODE_NO_FILL:
-//                        event.putString("error", "ERROR_CODE_NO_FILL");
-//                        break;
-//                }
-//                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_DID_RECEIVE_AD_ERROR.toString(), event);
-//
-//                mPubMaticBidding = true; // OpenWrap will refresh its bidding automatically every 30 sec
-//            }
-//
-//            @Override
-//            public void onAdOpened(POBBannerView adView) {
-//                //
-//            }
-//
-//            @Override
-//            public void onAdClosed(POBBannerView adView) {
-//                //
-//            }
-//        });
-    }
-
-    private void didFinishPubMaticBidding() {
-        mPubMaticBidding = false;
-        proceedToLoadAd();
-    }
-
-    private void proceedToLoadAd() {
-//        if (mPubMaticBidding || (mBannerView == null)) { return; }
-//        mBannerView.proceedToLoadAd();
     }
 }
