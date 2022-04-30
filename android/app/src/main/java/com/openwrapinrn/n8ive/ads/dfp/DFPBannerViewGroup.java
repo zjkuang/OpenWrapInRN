@@ -157,9 +157,7 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
 
         AdManagerAdView adView = new AdManagerAdView(this.mThemedReactContext);
         adView.setAdSizes(AdSize.BANNER, AdSize.MEDIUM_RECTANGLE, AdSize.FLUID);
-        //adView.setAdSizes(AdSize.BANNER);
-        // adView.setAdSizes(mAdSizes);
-        adView.setAdUnitId(mAdUnitID); // test ID: "/6499/example/banner"
+        adView.setAdUnitId(mAdUnitID); 
         removeBanner();
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
