@@ -33,7 +33,6 @@ export const HomeComponent = () => {
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <View style={[styles.fullScreenContainer, styles.contentAlignmentCenter]}>
         <AdPlacementSelector onSelect={onSelectAdPlacement} />
-        <Text>OpenWrap Demo</Text>
         <View style={[styles.bottomAdContainer, {height: adSize.height}]}>
           {adPlacement === 'Home-Anchor' && <AdView placement={adPlacement} />}
           {adPlacement === 'List-Inside' && <AdView placement={adPlacement} />}

@@ -267,6 +267,7 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
                 int height = adView.getCreativeSize().getAdHeight();
                 int left = adView.getLeft();
                 int top = adView.getTop();
+                Log.d(LOG_TAG, String.format("onAdReceived :: size: %dx%d", width, height));
                 adView.measure(width, height);
                 adView.layout(left, top, left + width, top + height);
 
