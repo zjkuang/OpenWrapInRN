@@ -25,7 +25,8 @@ export const useAdSize = (placement: AdPlacement) => {
     } else if (placement === 'List-Bottom') {
       const size: Size = {
         width: windowWidth,
-        height: 100 * (windowWidth / 300),
+        // height: 100 * (windowWidth / 300),
+        height: 500,
       };
       return size;
     } else {
