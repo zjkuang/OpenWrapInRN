@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  StatusBar,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {SafeAreaView, StatusBar, useColorScheme, View} from 'react-native';
 import {AdPlacement, useAdSize} from './helper';
 import {AdPlacementSelector} from './AdPlacementSelector';
 import {AdView} from './AdView';
