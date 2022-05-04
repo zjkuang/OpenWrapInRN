@@ -20,6 +20,7 @@ import com.facebook.react.views.view.ReactViewGroup;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.ResponseInfo;
 import com.google.android.gms.ads.admanager.AdManagerAdRequest;
 import com.google.android.gms.ads.admanager.AdManagerAdView;
 import com.google.android.gms.ads.admanager.AppEventListener;
@@ -33,6 +34,9 @@ import com.pubmatic.sdk.openwrap.eventhandler.dfp.DFPBannerEventHandler;
 
 import java.util.List;
 import java.util.Map;
+
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListener {
     private ThemedReactContext mThemedReactContext;
@@ -157,7 +161,9 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
 
         AdManagerAdView adView = new AdManagerAdView(this.mThemedReactContext);
         adView.setAdSizes(AdSize.BANNER, AdSize.MEDIUM_RECTANGLE, AdSize.FLUID);
-        adView.setAdUnitId(mAdUnitID); 
+        adView.setAdUnitId(mAdUnitID);
+        adView.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+
         removeBanner();
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -188,6 +194,19 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();
+
+                adView.addOnLayoutChangeListener(
+                        (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+                            // Forward the new height to its container.
+                            int newMeasuredHeight = v.getMeasuredHeight();
+                            int newHeight = v.getHeight();
+                            Log.d("test", "onLayoutChange: MeasuredHeight::" + newMeasuredHeight);
+                            Log.d("test", "onLayoutChange: Height::" + newHeight);
+
+                            ResponseInfo responseInfo = adView.getResponseInfo();
+                            Log.d("test", "onLayoutChange: responseInfo::" + responseInfo);
+                        }
+                );
                 // Setting the gravity to center was causing an layout issue when OpenWrap Banner is integrated with React Native application,
                 // To resolve this issue, one must overwrite the child views of POBBannerView's property to NO_GRAVITY
                 int childCount = adView.getChildCount();
@@ -210,11 +229,12 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
 
                 AdSize adSize = adView.getAdSize();
                 int width = adSize.getWidthInPixels(mThemedReactContext);
-                int height = adSize.getHeightInPixels(mThemedReactContext) + 200;
-                int left = adView.getLeft() + 500;
+                int height2 = adView.getMeasuredHeight();
+                int height = adSize.getHeightInPixels(mThemedReactContext);
+                int left = adView.getLeft() + 800;
                 int top = adView.getTop();
                 adView.measure(width, height);
-                adView.layout(left, top, left + width, top + height);
+                adView.layout(left, top, left +  width, top + height);
 
                 if (adView.getAdSize().isFluid()) {
                     // Seems we still cannot recognize the fluid ad.
