@@ -164,6 +164,16 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
         addView(adView, layoutParams);
         mAdView = adView;
         adView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+
+        addAdListener();
+        addLayoutListener();
+
+        AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+    }
+
+    private void addAdListener() {
+        if (mAdView == null) { return; }
         mAdView.setAdListener(new AdListener() {
             @Override
             public void onAdClicked() {
@@ -190,9 +200,9 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
                 super.onAdLoaded();
                 // Setting the gravity to center was causing an layout issue when OpenWrap Banner is integrated with React Native application,
                 // To resolve this issue, one must overwrite the child views of POBBannerView's property to NO_GRAVITY
-                int childCount = adView.getChildCount();
+                int childCount = mAdView.getChildCount();
                 for (int position = 0; position < childCount; position++){
-                    View childView = adView.getChildAt(position);
+                    View childView = mAdView.getChildAt(position);
                     if(childView.getLayoutParams() instanceof FrameLayout.LayoutParams){
                         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)childView.getLayoutParams();
                         layoutParams.gravity = Gravity.END;
@@ -208,19 +218,19 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
                     }
                 }
 
-                AdSize adSize = adView.getAdSize();
+                AdSize adSize = mAdView.getAdSize();
                 int width = adSize.getWidthInPixels(mThemedReactContext);
-                int height = adSize.getHeightInPixels(mThemedReactContext) + 200;
-                int left = adView.getLeft() + 500;
-                int top = adView.getTop();
-                adView.measure(width, height);
-                adView.layout(left, top, left + width, top + height);
+                int height = adSize.getHeightInPixels(mThemedReactContext);
+                int left = mAdView.getLeft();
+                int top = mAdView.getTop();
+                mAdView.measure(width, height);
+                mAdView.layout(left, top, left + width, top + height);
 
-                if (adView.getAdSize().isFluid()) {
+                if (mAdView.getAdSize().isFluid()) {
                     // Seems we still cannot recognize the fluid ad.
                 }
 
-                adView.setBackgroundColor(getResources().getColor(R.color.catalyst_redbox_background));
+                mAdView.setBackgroundColor(getResources().getColor(R.color.catalyst_redbox_background));
                 WritableMap size = Arguments.createMap();
                 size.putDouble("width", width);
                 size.putDouble("height", height);
@@ -241,9 +251,22 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
                 super.onAdOpened();
             }
         });
+    }
 
-        AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+    private void addLayoutListener() {
+        if (mAdView == null) { return; }
+        mAdView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                int measuredWidth = view.getMeasuredWidth();
+                int measuredHeight = view.getMeasuredHeight();
+                Log.d(LOG_TAG, String.format(
+                        "onLayoutChange :: new: (%d,%d),%dx%d; old: (%d,%d),%dx%d; measuredSize: %dx%d",
+                        left, top, (right - left), (bottom - top),
+                        oldLeft, oldTop, (oldRight - oldLeft), (oldBottom - oldTop),
+                        measuredWidth, measuredHeight));
+            }
+        });
     }
 
     private void removeBanner() {
