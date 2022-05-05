@@ -1,20 +1,14 @@
 package com.openwrapinrn.n8ive.ads.dfp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.views.view.ReactViewGroup;
 import com.google.android.gms.ads.AdListener;
@@ -25,18 +19,7 @@ import com.google.android.gms.ads.admanager.AdManagerAdRequest;
 import com.google.android.gms.ads.admanager.AdManagerAdView;
 import com.google.android.gms.ads.admanager.AppEventListener;
 import com.openwrapinrn.R;
-import com.pubmatic.sdk.common.POBError;
-import com.pubmatic.sdk.openwrap.banner.POBBannerView;
-import com.pubmatic.sdk.openwrap.core.POBBid;
-import com.pubmatic.sdk.openwrap.core.POBBidEvent;
-import com.pubmatic.sdk.openwrap.core.POBBidEventListener;
-import com.pubmatic.sdk.openwrap.eventhandler.dfp.DFPBannerEventHandler;
 
-import java.util.List;
-import java.util.Map;
-
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListener {
     private ThemedReactContext mThemedReactContext;
@@ -54,6 +37,7 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
     private Boolean mPropChanged = false;
 
     AdManagerAdView mAdView = null;
+    boolean isFluid = false;
 
     public DFPBannerViewGroup(ThemedReactContext context) {
         super(context);
@@ -65,6 +49,11 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
     @Override
     public void onAppEvent(@NonNull String name, @NonNull String info) {
         Log.d(LOG_TAG, String.format("onAppEvent: %s", name));
+
+        this.isFluid = true;
+
+        this.updateLayout();
+
         WritableMap event = Arguments.createMap();
         event.putString(name, info);
         mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_ADMOB_EVENT_RECEIVED.toString(), event);
@@ -159,17 +148,15 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
             return;
         }
 
-        AdManagerAdView adView = new AdManagerAdView(this.mThemedReactContext);
-        adView.setAdSizes(AdSize.BANNER, AdSize.MEDIUM_RECTANGLE, AdSize.FLUID);
-        adView.setAdUnitId(mAdUnitID);
-        adView.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-
         removeBanner();
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        addView(adView, layoutParams);
-        mAdView = adView;
-        adView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+
+        mAdView = new AdManagerAdView(this.mThemedReactContext);
+        mAdView.setAdSizes(AdSize.FLUID);
+        mAdView.setAdUnitId(mAdUnitID);
+//        mAdView.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+//
+//        mAdView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+        mAdView.setAppEventListener(this);
         mAdView.setAdListener(new AdListener() {
             @Override
             public void onAdClicked() {
@@ -195,7 +182,7 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
             public void onAdLoaded() {
                 super.onAdLoaded();
 
-                adView.addOnLayoutChangeListener(
+                mAdView.addOnLayoutChangeListener(
                         (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
                             // Forward the new height to its container.
                             int newMeasuredHeight = v.getMeasuredHeight();
@@ -203,57 +190,42 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
                             Log.d("test", "onLayoutChange: MeasuredHeight::" + newMeasuredHeight);
                             Log.d("test", "onLayoutChange: Height::" + newHeight);
 
-                            ResponseInfo responseInfo = adView.getResponseInfo();
+                            ResponseInfo responseInfo = mAdView.getResponseInfo();
                             Log.d("test", "onLayoutChange: responseInfo::" + responseInfo);
                         }
                 );
-                // Setting the gravity to center was causing an layout issue when OpenWrap Banner is integrated with React Native application,
-                // To resolve this issue, one must overwrite the child views of POBBannerView's property to NO_GRAVITY
-                int childCount = adView.getChildCount();
-                for (int position = 0; position < childCount; position++){
-                    View childView = adView.getChildAt(position);
-                    if(childView.getLayoutParams() instanceof FrameLayout.LayoutParams){
-                        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)childView.getLayoutParams();
-                        layoutParams.gravity = Gravity.END;
-                        // This doesn't work for fluid ads
-                        // if (fluid) {
-                        //     // https://developers.google.com/ad-manager/mobile-ads-sdk/android/native/styles#fluid_size
-                        //     layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
-                        //     layoutParams.width = LayoutParams.MATCH_PARENT;
-                        //     layoutParams.height = LayoutParams.WRAP_CONTENT;
-                        // }
-                        // Fluid ads seems to have been broken by GAM Android SDK:
-                        //   https://groups.google.com/g/google-admob-ads-sdk/c/PLc6xW1_ETA/m/xMO8JRuzAQAJ
-                    }
-                }
 
-                AdSize adSize = adView.getAdSize();
-                int width = adSize.getWidthInPixels(mThemedReactContext);
-                int height2 = adView.getMeasuredHeight();
-                int height = adSize.getHeightInPixels(mThemedReactContext);
-                int left = adView.getLeft() + 800;
-                int top = adView.getTop();
-                adView.measure(width, height);
-                adView.layout(left, top, left +  width, top + height);
+                AdSize adSize = mAdView.getAdSize();
+                Context context = getContext();
 
-                if (adView.getAdSize().isFluid()) {
+                int width = adSize.getWidthInPixels(context);
+                int height = adSize.getHeightInPixels(context) * 3;
+
+                int left = mAdView.getLeft() + 800 ;
+                int top = mAdView.getTop();
+
+                View parent = (View) mAdView.getParent();
+
+//                if (parent != null) {
+//                    int parentWidth = parent.getWidth();
+//
+//                    left = (parentWidth - width) / 2;
+//                }
+
+                mAdView.measure(width, height);
+                mAdView.layout(left, top, left + width, top + height);
+
+                if (adSize.isFluid()) {
                     // Seems we still cannot recognize the fluid ad.
+                    Log.d("test", "isFluid: true");
                 }
 
-                adView.setBackgroundColor(getResources().getColor(R.color.catalyst_redbox_background));
-                WritableMap size = Arguments.createMap();
-                size.putDouble("width", width);
-                size.putDouble("height", height);
-                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_SIZE_CHANGE.toString(), size);
+                mAdView.setBackgroundColor(getResources().getColor(R.color.catalyst_redbox_background));
 
-                WritableMap frame = Arguments.createMap();
-                //frame.putDouble("x", left);
-                //frame.putDouble("y", top);
-                frame.putDouble("width", width);
-                frame.putDouble("height", height);
-                mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_DID_RECEIVE_AD.toString(), frame);
+                // Post adSize back to RN.
+                sendOnSizeChangeEvent(width, height);
 
-                //mPubMaticBidding = true; // OpenWrap will refresh its bidding automatically every 30 sec
+                addView(mAdView);
             }
 
             @Override
@@ -264,6 +236,22 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
 
         AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+    }
+
+    private void sendOnSizeChangeEvent(int width, int height) {
+        WritableMap size = Arguments.createMap();
+        size.putDouble("width", width);
+        size.putDouble("height", height);
+        mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_SIZE_CHANGE.toString(), size);
+
+        WritableMap frame = Arguments.createMap();
+        //frame.putDouble("x", left);
+        //frame.putDouble("y", top);
+        frame.putDouble("width", width);
+        frame.putDouble("height", height);
+        mEmitter.receiveEvent(getId(), DFPBannerViewManager.Events.EVENT_DID_RECEIVE_AD.toString(), frame);
+
+        //mPubMaticBidding = true; // OpenWrap will refresh its bidding automatically every 30 sec
     }
 
     private void removeBanner() {
@@ -277,6 +265,108 @@ public class DFPBannerViewGroup extends ReactViewGroup implements AppEventListen
         if (mAdView != null) {
             mAdView.destroy();
             mAdView = null;
+        }
+    }
+
+    private class MeasureAndLayoutRunnable implements Runnable {
+        @Override
+        public void run() {
+            updateLayout();
+        }
+    }
+
+    private boolean isFluid() {
+        return this.isFluid;
+    }
+
+    @Override
+    public void requestLayout() {
+        super.requestLayout();
+
+        if (isFluid()) {
+            post(new DFPBannerViewGroup.MeasureAndLayoutRunnable());
+        }
+    }
+
+    @SuppressLint("DrawAllocation")
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        if (isFluid()) {
+            post(new DFPBannerViewGroup.MeasureAndLayoutRunnable());
+        }
+    }
+
+    private static void measureAndLayout(View view, int width, int height) {
+        int left = 0;
+        int top = 0;
+
+        view.measure(width, height);
+        view.layout(left, top, left + width, top + height);
+        view.requestLayout();
+        view.invalidate();
+        view.forceLayout();
+    }
+
+    int cachedWidth = 0;
+    int cachedHeight = 0;
+
+    private void updateLayout() {
+        try {
+            if (!isFluid()) {
+                return;
+            }
+
+            if (mAdView == null) {
+                return;
+            }
+
+            View parent = (View) mAdView.getParent();
+
+            if (parent == null) {
+                return;
+            }
+
+            int width = parent.getWidth();
+            int height = parent.getHeight();
+
+            if (cachedWidth == width && cachedHeight == height) {
+                return;
+            }
+
+            cachedWidth = width;
+            cachedHeight = height;
+
+            // In case of fluid ads, every GAD view and their subviews must be laid out by hand,
+            // otherwise the web view won't align to the container bounds.
+            measureAndLayout(mAdView, width, height);
+
+            ViewGroup child = (ViewGroup) mAdView.getChildAt(0);
+
+            if (child != null) {
+                measureAndLayout(child, width, height);
+
+                ViewGroup webView = (ViewGroup) child.getChildAt(0);
+
+                if (webView != null) {
+                    measureAndLayout(webView, width, height);
+
+                    ViewGroup internalChild = (ViewGroup) webView.getChildAt(0);
+
+                    if (internalChild != null) {
+                        measureAndLayout(internalChild, width, height);
+
+                        ViewGroup leafNode = (ViewGroup) internalChild.getChildAt(0);
+
+                        if (leafNode != null) {
+                            measureAndLayout(leafNode, width, height);
+                        }
+                    }
+                }
+            }
+        } catch (Exception exception) {
+            Log.e("error", "Failed to layout:" + exception.getLocalizedMessage());
         }
     }
 }
